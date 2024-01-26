@@ -1,4 +1,4 @@
-# Pong_pygame
+# V-Pong
  
 This is my first game project, V-PONG which stands for Vertical Pong.
 
