@@ -16,8 +16,9 @@ Now this is my version of Pong:
 
 ![vpong1](/Images/vpong1.png)
 
-![demo](https://github.com/Kj0ric/V-Pong/assets/99014503/b98e1611-0c09-4295-98f4-6436313e9576)
-
+<div align="center">
+  <img src="/Images/demo.gif"/>
+</div>
 
 ![vpong2](/Images/vpong2.png)
 
