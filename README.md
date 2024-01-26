@@ -2,7 +2,7 @@
  
 This is my first game project, V-PONG which stands for Vertical Pong.
 
-It is actually funny because I misremember the original horizontal design and made it in a vertical fashion.
+It is actually funny because I misremembered the original horizontal design and made it in a vertical fashion.
 
 <div align="center">
   <table>
