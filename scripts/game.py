@@ -13,6 +13,7 @@ SCREEN_WIDTH = 800 #pixels
 SCREEN_HEIGHT = 600
 
 GAME_SPEED = 60 #frames per second
+MAX_BALL_SPEED = 35
 
 BALL_SIZE = 15
 BALL_SPEED_X = random.choice([-4, 4])
@@ -21,25 +22,29 @@ BALL_POS = [(SCREEN_WIDTH - BALL_SIZE) // 2, (SCREEN_HEIGHT - BALL_SIZE) // 2]
 
 PADDLE_WIDTH = 20
 PADDLE_HEIGHT = 100
-PADDLE_SPEED = 8
+PADDLE_SPEED = 14
 PADDLE_POS_TOP = [(SCREEN_WIDTH - PADDLE_HEIGHT) // 2, 0]
 PADDLE_POS_BOT = [(SCREEN_WIDTH - PADDLE_HEIGHT) // 2, SCREEN_HEIGHT - PADDLE_WIDTH]
 
 clock = pygame.time.Clock()
+timePassed = 0
 
 scoreRed = 0
 scoreGreen = 0
 
 font = pygame.font.Font(None, 50)   
-menuFont = pygame.font.Font(None, 50)
+menuFont = pygame.font.Font(None, 30)
 LARGE_FONT = pygame.font.Font(None, 100)
 
 def DrawEverything(screen, ball, redPaddle, greenPaddle):
+    global scoreRed, scoreGreen
     screen.fill((0, 0, 0))
     
     pygame.draw.rect(screen, (255, 0, 0), redPaddle)
     pygame.draw.rect(screen, (0, 255, 0), greenPaddle)
     pygame.draw.rect(screen, (0, 0, 255), ball)
+    
+    draw_dashed_line(screen, (255, 255, 255), (0, SCREEN_HEIGHT // 2), (SCREEN_WIDTH, SCREEN_HEIGHT // 2))
     
     # Render the scores
     scoreRedSurface = font.render(f"R: {scoreRed}", True, (255, 0, 0))  # Red color
@@ -52,8 +57,14 @@ def DrawEverything(screen, ball, redPaddle, greenPaddle):
     # Calculate the positions of the scores
     center_x = SCREEN_WIDTH // 2
     center_y = SCREEN_HEIGHT // 2
-    scoreRedPos = (center_x - scoreRedSurface.get_width() - 10, center_y - scoreRedSurface.get_height() // 2)
-    scoreGreenPos = (center_x + 10, center_y - scoreGreenSurface.get_height() // 2)
+    
+    # Get the rectangles that enclose the scores
+    scoreRedRect = scoreRedSurface.get_rect()
+    scoreGreenRect = scoreGreenSurface.get_rect()
+    
+    # Calculate the positions of the scores so that they are centered
+    scoreRedPos = (center_x - scoreRedRect.width // 2, center_y - 30 - scoreRedRect.height // 2)
+    scoreGreenPos = (center_x - scoreGreenRect.width // 2, center_y + 30 - scoreGreenRect.height // 2)
 
     # Draw the scores
     screen.blit(scoreRedSurface, scoreRedPos)
@@ -88,13 +99,21 @@ def MainGameLoop(screen, ball, redPaddle, greenPaddle):
         
         if not paused: 
             # Update the display
-            pygame.display.flip()
-            clock.tick(80)
             
             # Draw the objects
             DrawEverything(screen, ball, redPaddle, greenPaddle)
             
-            # Move the ball
+            # Move the ball in an accelerated fashion 
+            global timePassed
+            dt = clock.tick(60) / 1000  # Time passed since last tick in seconds.
+            timePassed += dt
+            
+            global BALL_SPEED_X, BALL_SPEED_Y
+            if timePassed > 5:
+                BALL_SPEED_X = min(BALL_SPEED_X + 2 if BALL_SPEED_X > 0 else BALL_SPEED_X - 2, MAX_BALL_SPEED)
+                BALL_SPEED_Y = min(BALL_SPEED_Y + 2 if BALL_SPEED_Y > 0 else BALL_SPEED_Y - 2, MAX_BALL_SPEED)
+                timePassed = 0
+                
             ball.move_ip(BALL_SPEED_X, BALL_SPEED_Y)
             
             # Move the paddle
@@ -104,7 +123,34 @@ def MainGameLoop(screen, ball, redPaddle, greenPaddle):
             if HandleCollision(screen, ball, redPaddle, greenPaddle):
                 # A player has scored
                 pygame.time.delay(500) # wait 500 milliseconds
+                ResetBallSpeed()
                 ResetGame(ball, redPaddle, greenPaddle)
+                
+                        
+            pygame.display.flip()
+            clock.tick(60)
+
+def draw_dashed_line(surface, color, start_pos, end_pos, width=1, dash_length=5):
+    x1, y1 = start_pos
+    x2, y2 = end_pos
+    dl = dash_length
+    
+    if (x1 == x2):
+        ycoords = [y for y in range(y1, y2, dl if y1 < y2 else -dl)]
+        xcoords = [x1] * len(ycoords)
+    else: 
+        xcoords = [x for x in range(x1, x2, dl if x1 < x2 else -dl)]
+        ycoords = [y1] * len(xcoords)
+        
+    next_coords = list(zip(xcoords[1::2], ycoords[1::2]))
+    last_coords = list(zip(xcoords[0::2], ycoords[0::2]))
+    for (x1, y1), (x2, y2) in zip(next_coords, last_coords):
+        pygame.draw.line(surface, color, (x1, y1), (x2, y2), width)
+
+def ResetBallSpeed():
+    global BALL_SPEED_X, BALL_SPEED_Y
+    BALL_SPEED_X = random.choice([-4, 4])
+    BALL_SPEED_Y = random.choice([-4, 4])
 
 def KeyBinds(redPaddle, greenPaddle):
     keys = pygame.key.get_pressed()
@@ -138,12 +184,12 @@ def HandleCollision(screen, ball, redPaddle, greenPaddle):
     global BALL_SPEED_X, BALL_SPEED_Y, scoreRed, scoreGreen
     # Check for collision with paddles
     if ball.colliderect(redPaddle) or ball.colliderect(greenPaddle):
-        # Reverse the x direction of the ball
+        # Reverse the y direction of the ball
         BALL_SPEED_Y *= -1
 
     # Check for collision with walls
     if ball.left <= 0 or ball.right >= SCREEN_WIDTH:
-        # Reverse the y direction of the ball
+        # Reverse the x direction of the ball
         BALL_SPEED_X *= -1
 
     # Check if a player has scored
@@ -158,8 +204,10 @@ def HandleCollision(screen, ball, redPaddle, greenPaddle):
 
     return False  # No player has scored
     
-        
 def StartMenu(screen):
+    # Load the screenshot image
+    #background = pygame.image.load('screenshot.png')
+
     # Take a screenshot of the game screen
     background = pygame.Surface(screen.get_size())
     background.fill((0, 0, 0))
@@ -168,11 +216,20 @@ def StartMenu(screen):
     label2 = menuFont.render("Press SPACE to start", 1, (255, 255, 255))
     label3 = menuFont.render("Press ESC to pause", 1, (255, 255, 255))
     
+    # Render the player controls text
+    controls_text = "Player 1: A/D keys"
+    controls_text2 = "Player 2: Left/Right arrows"
+    label4 = menuFont.render(controls_text, 1, (255, 0, 0))
+    label5 = menuFont.render(controls_text2, 1, (0, 255, 0))
+    
     while True:
         screen.blit(background, (0, 0))  
         screen.blit(label1, ((SCREEN_WIDTH - label1.get_width()) // 2, (SCREEN_HEIGHT - label1.get_height()) // 2 - 40))
         screen.blit(label2, ((SCREEN_WIDTH - label2.get_width()) // 2, (SCREEN_HEIGHT - label2.get_height()) // 2 + 40))
         screen.blit(label3, ((SCREEN_WIDTH - label3.get_width()) // 2, (SCREEN_HEIGHT - label3.get_height()) // 2 + 80))
+        # Display the player controls text
+        screen.blit(label4, ((SCREEN_WIDTH - label4.get_width()) // 2, (SCREEN_HEIGHT - label4.get_height()) // 2 + 120))
+        screen.blit(label5, ((SCREEN_WIDTH - label5.get_width()) // 2, (SCREEN_HEIGHT - label5.get_height()) // 2 + 160))
         pygame.display.update()
         
         for event in pygame.event.get():
