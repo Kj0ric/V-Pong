@@ -4,23 +4,22 @@ This is my first game project, V-PONG which stands for Vertical Pong.
 
 It is actually funny because I misremember the original horizontal design and made it in a vertical fashion.
 
-<p align="middle">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Pong.svg/1200px-Pong.svg.png" width="300" height="300"/>  
-  <img src="https://i.pinimg.com/564x/e6/11/1e/e6111e83dcf8f0a91b23fa6ae45c32e4.jpg" width="300" height="300"/>
-</p>
+<div align="center">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Pong.svg/1200px-Pong.svg.png" width="300" height="300" style="display: inline-block; margin-right: 400px;">
+  <img src="https://i.pinimg.com/564x/e6/11/1e/e6111e83dcf8f0a91b23fa6ae45c32e4.jpg" width="300" height="300" style="display: inline-block;">
+</div>
+
 
 
 I used VS Code as the text editor. The reason why I chose VS Code was Github Copilot X and thankfully it has contributed to my experience gain in this project vastly. 
 
 Now this is my version of Pong: 
 
-![vpong1](/Images/vpong1.png)
-
+[See the demo video](/Images/demo.mov)
 <div align="center">
-  <img src="/Images/demo.gif"/>
+  <img src="/Images/vpong1.png" width=550>
+  <img src="/Images/vpong2.png" width=600>
 </div>
-
-![vpong2](/Images/vpong2.png)
 
 ## Current Features
 ### Main game loop
