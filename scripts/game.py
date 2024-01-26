@@ -16,8 +16,8 @@ GAME_SPEED = 60 #frames per second
 MAX_BALL_SPEED = 35
 
 BALL_SIZE = 15
-BALL_SPEED_X = random.choice([-4, 4])
-BALL_SPEED_Y = random.choice([-4, 4])
+BALL_SPEED_X = random.choice([-8, 8])
+BALL_SPEED_Y = random.choice([-8, 8])
 BALL_POS = [(SCREEN_WIDTH - BALL_SIZE) // 2, (SCREEN_HEIGHT - BALL_SIZE) // 2]
 
 PADDLE_WIDTH = 20
@@ -109,7 +109,7 @@ def MainGameLoop(screen, ball, redPaddle, greenPaddle):
             timePassed += dt
             
             global BALL_SPEED_X, BALL_SPEED_Y
-            if timePassed > 5:
+            if timePassed > 10:
                 BALL_SPEED_X = min(BALL_SPEED_X + 2 if BALL_SPEED_X > 0 else BALL_SPEED_X - 2, MAX_BALL_SPEED)
                 BALL_SPEED_Y = min(BALL_SPEED_Y + 2 if BALL_SPEED_Y > 0 else BALL_SPEED_Y - 2, MAX_BALL_SPEED)
                 timePassed = 0
@@ -149,8 +149,8 @@ def draw_dashed_line(surface, color, start_pos, end_pos, width=1, dash_length=5)
 
 def ResetBallSpeed():
     global BALL_SPEED_X, BALL_SPEED_Y
-    BALL_SPEED_X = random.choice([-4, 4])
-    BALL_SPEED_Y = random.choice([-4, 4])
+    BALL_SPEED_X = random.choice([-8, 8])
+    BALL_SPEED_Y = random.choice([-8, 8])
 
 def KeyBinds(redPaddle, greenPaddle):
     keys = pygame.key.get_pressed()
